@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3eb">
+  <title>Судоку без спешки</title>
+  <link rel="icon" type="image/png" href="icons/icon_512x512.png">
+  <link rel="stylesheet" href="style.css?v=20260702">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="ghost-button topbar-button" id="backButton" type="button" hidden>Назад</button>
+      <div class="brand-block" aria-hidden="true">
+        <span class="leaf-mark"></span>
+        <span>Судоку без спешки</span>
+      </div>
+      <button class="ghost-button topbar-button" id="settingsButton" type="button" aria-haspopup="dialog">Настройки</button>
+    </header>
+
+    <main class="screen-host">
+      <section class="screen menu-screen" id="menuScreen">
+        <div class="main-menu-panel">
+          <div class="menu-leaf" aria-hidden="true"></div>
+          <div class="menu-copy">
+            <h1><span>Судоку</span><span>без спешки</span></h1>
+            <p>Спокойная игра для ясного ума и хорошего настроения</p>
+          </div>
+          <div class="main-actions">
+            <button class="primary-button big-button" id="playButton" type="button">Играть</button>
+            <button class="ghost-button continue-card" id="continueButton" type="button" hidden>
+              <span>Продолжить</span>
+              <small id="continueInfo">Сохранённая партия</small>
+            </button>
+          </div>
+          <div class="menu-shortcuts" aria-label="Дополнительные разделы">
+            <button id="statsButton" type="button" class="round-action">
+              <span class="ui-icon icon-stats" aria-hidden="true"></span>
+              <span>Статистика</span>
+            </button>
+            <button id="achievementsButton" type="button" class="round-action">
+              <span class="ui-icon icon-trophy" aria-hidden="true"></span>
+              <span>Достижения</span>
+            </button>
+            <button id="menuSettingsButton" type="button" class="round-action" aria-haspopup="dialog">
+              <span class="ui-icon icon-settings" aria-hidden="true"></span>
+              <span>Настройки</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen level-screen" id="levelScreen" hidden>
+        <div class="level-heading">
+          <div>
+            <p class="eyebrow">Варианты уровней</p>
+            <h2>Выберите режим</h2>
+          </div>
+          <p>Нет спешки. Есть логика, тишина и удовольствие.</p>
+        </div>
+        <div class="mode-grid" id="modeGrid"></div>
+      </section>
+
+      <section class="screen game-screen" id="gameScreen" hidden>
+        <aside class="game-info">
+          <div class="mode-copy">
+            <span class="mode-icon mode-icon-diagonal" id="modeIcon" aria-hidden="true"></span>
+            <div>
+              <h2 id="modeTitle">Судоку</h2>
+              <p class="difficulty-chip" id="modeEyebrow">Режим</p>
+              <p class="mode-legend" id="modeLegend" hidden></p>
+            </div>
+            <p id="modeDescription">Заполните поле числами.</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card stat-time">
+              <span>Время</span>
+              <strong id="timerText">00:00</strong>
+            </div>
+            <div class="stat-card stat-errors">
+              <span>Ошибки</span>
+              <strong id="mistakesText">0</strong>
+            </div>
+            <div class="stat-card stat-hints">
+              <span>Подсказки</span>
+              <strong id="hintsText">3</strong>
+            </div>
+            <div class="stat-card stat-progress">
+              <span>Прогресс</span>
+              <strong id="progressText">0%</strong>
+            </div>
+          </div>
+
+          <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Прогресс решения" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="progressFill"></span>
+          </div>
+
+          <div class="tools-panel">
+            <button id="newPuzzleButton" type="button">Новая</button>
+            <button id="pauseButton" type="button">Пауза</button>
+            <button id="hintButton" type="button">Подсказка</button>
+            <button id="tutorialButton" type="button">Как играть</button>
+            <button id="undoButton" type="button">Отмена</button>
+            <button id="eraseButton" type="button">Стереть</button>
+            <button id="notesButton" type="button" aria-pressed="false">Заметки</button>
+          </div>
+          <p class="tip-text" id="tipText" aria-live="polite">Выберите клетку, затем число.</p>
+        </aside>
+
+        <section class="board-zone" aria-label="Игровое поле">
+          <div class="board-wrap">
+            <div class="sudoku-board" id="board" aria-label="Сетка судоку"></div>
+          </div>
+          <div class="number-pad" id="numberPad" aria-label="Цифры"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+    <div class="modal-card settings-card">
+      <span class="modal-icon" id="settingsModalIcon" aria-hidden="true"></span>
+      <h2 id="settingsTitle">Настройки</h2>
+      <label class="toggle-line">
+        <input id="soundToggle" type="checkbox" checked>
+        <span>Звуковые сигналы</span>
+      </label>
+      <label class="toggle-line">
+        <input id="autoCheckToggle" type="checkbox" checked>
+        <span>Проверять ошибки сразу</span>
+      </label>
+      <label class="toggle-line">
+        <input id="highlightToggle" type="checkbox" checked>
+        <span>Подсвечивать связанные клетки</span>
+      </label>
+      <div class="modal-actions">
+        <button id="resetProgressButton" class="danger-button" type="button">Сбросить прогресс</button>
+        <button id="closeSettingsButton" class="primary-button" type="button">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="messageModal" role="dialog" aria-modal="true" aria-labelledby="messageTitle" hidden>
+    <div class="modal-card">
+      <span class="modal-icon" id="messageModalIcon" aria-hidden="true"></span>
+      <h2 id="messageTitle">Пауза</h2>
+      <div class="message-text" id="messageText">Игра приостановлена.</div>
+      <div class="modal-actions" id="messageActions"></div>
+    </div>
+  </div>
+
+  <script src="game.js?v=20260702"></script>
+</body>
+</html>

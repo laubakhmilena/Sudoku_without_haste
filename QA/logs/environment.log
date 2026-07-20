@@ -1,0 +1,31 @@
+DATE
+2026-07-20T11:50:12+00:00
+UNAME
+Linux 705c22d69d72 4.4.0 #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux
+CPU
+Architecture:        x86_64
+CPU(s):              56
+On-line CPU(s) list: 0-55
+Model name:          unknown
+MEM
+               total        used        free      shared  buff/cache   available
+Mem:           4.0Gi       743Mi       3.3Gi          0B       255Mi       3.3Gi
+Swap:             0B          0B          0B
+NODE
+v22.16.0
+NPM
+10.9.2
+PYTHON
+Python 3.13.5
+CHROMIUM
+Chromium 144.0.7559.96 built on Debian GNU/Linux 13 (trixie)
+HASHES
+c27ab7f00b8cbeefff00c9d50f465056d9fe1ac428bbe603a82b13cc3301eed1  /mnt/data/index(2).html
+e347f3f65ac2f9f761507998e1b5227448b234d93bc413f54870d8db0e6879f1  /mnt/data/game(1).js
+1a4a72aa5e5c369e19b23edf9ff18d23b8f37acc9b5c9db70608db5f1ae734e8  /mnt/data/style(2).css
+57e97eb5a61e4167191ed46030f0246ed385dd447da4952d10275f5b9e7d5d1e  /mnt/data/Вставленный текст(2).txt
+FILES
+game(1).js 108778 bytes
+index(2).html 7158 bytes
+style(2).css 53323 bytes
+Вставленный текст(2).txt 73160 bytes

@@ -1,0 +1,64 @@
+PASS | required document prefix 00_ | 
+PASS | required document prefix 01_ | 
+PASS | required document prefix 02_ | 
+PASS | required document prefix 03_ | 
+PASS | required document prefix 04_ | 
+PASS | required document prefix 05_ | 
+PASS | required document prefix 06_ | 
+PASS | required document prefix 07_ | 
+PASS | required document prefix 08_ | 
+PASS | required document prefix 09_ | 
+PASS | required document prefix 10_ | 
+PASS | required document prefix 11_ | 
+PASS | required document prefix 12_ | 
+PASS | required document prefix 13_ | 
+PASS | required document prefix 14_ | 
+PASS | required document prefix 15_ | 
+PASS | required document prefix 16_ | 
+PASS | required document prefix 17_ | 
+PASS | required document prefix 18_ | 
+PASS | required document prefix 19_ | 
+PASS | required document prefix 20_ | 
+PASS | required document prefix 21_ | 
+PASS | required document prefix 22_ | 
+PASS | required document prefix 23_ | 
+PASS | required document prefix 24_ | 
+PASS | checklist CHK-01_ | 
+PASS | checklist CHK-02_ | 
+PASS | checklist CHK-03_ | 
+PASS | checklist CHK-04_ | 
+PASS | checklist CHK-05_ | 
+PASS | checklist CHK-06_ | 
+PASS | checklist CHK-07_ | 
+PASS | checklist CHK-08_ | 
+PASS | checklist CHK-09_ | 
+PASS | checklist CHK-10_ | 
+PASS | checklist CHK-11_ | 
+PASS | checklist CHK-12_ | 
+PASS | checklist CHK-13_ | 
+PASS | checklist CHK-14_ | 
+PASS | checklist CHK-15_ | 
+PASS | checklist CHK-16_ | 
+PASS | checklist CHK-17_ | 
+PASS | checklist CHK-18_ | 
+PASS | checklist CHK-19_ | 
+PASS | checklist CHK-20_ | 
+PASS | test case IDs unique | 56
+PASS | bug IDs unique | 2
+PASS | test statuses allowed | ['BLOCKED', 'FAIL', 'NOT_RUN', 'PASS']
+PASS | checklist statuses allowed | []
+PASS | execution total consistent | 56
+PASS | execution Passed consistent | 18
+PASS | execution Failed consistent | 2
+PASS | execution Blocked consistent | 13
+PASS | execution Not Run consistent | 23
+PASS | execution Not Applicable consistent | 0
+PASS | bug count consistent | 
+PASS | evidence/log references exist | []
+PASS | trace rows cover feature matrix | 18
+PASS | source unchanged index(2).html | c27ab7f00b8cbeefff00c9d50f465056d9fe1ac428bbe603a82b13cc3301eed1
+PASS | source unchanged game(1).js | e347f3f65ac2f9f761507998e1b5227448b234d93bc413f54870d8db0e6879f1
+PASS | source unchanged style(2).css | 1a4a72aa5e5c369e19b23edf9ff18d23b8f37acc9b5c9db70608db5f1ae734e8
+PASS | no empty markdown/csv | []
+PASS | no obvious embedded secrets | []
+SUMMARY {"pass": 63, "fail": 0}

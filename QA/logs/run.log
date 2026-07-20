@@ -1,0 +1,25 @@
+[2026-07-20 11:45:31] Title: Судоку без спешки
+[2026-07-20 11:45:32] Menu visible: True
+[2026-07-20 11:45:32] Play visible: True
+[2026-07-20 11:45:32] Self-test: {"ok": true, "testedPuzzles": 48, "durationMs": 38, "problems": []}
+[2026-07-20 11:45:32] Mode cards: 4
+[2026-07-20 11:45:32] Classic cells: 81
+[2026-07-20 11:45:32] Classic givens: 44
+[2026-07-20 11:45:32] Number pad buttons: 9
+[2026-07-20 11:45:32] Correct entry persisted: True; mistakes=0
+[2026-07-20 11:45:33] Notes stored at 4: [1, 2]
+[2026-07-20 11:45:33] Pause modal visible: True
+[2026-07-20 11:45:33] Pause title: Пауза
+[2026-07-20 11:45:33] Pause modal closed: True
+[2026-07-20 11:45:33] Continue visible after simulated restart: True
+[2026-07-20 11:45:33] Restored board cell 0: 8 expected 8
+[2026-07-20 11:45:33] Restored notes at 4: [1, 2]
+[2026-07-20 11:45:33] Sound setting stored false: True
+[2026-07-20 11:45:33] Win title: Победа
+[2026-07-20 11:45:33] Active cleared on win: True; wins=1; firstWin=True
+[2026-07-20 11:45:34] Mobile mode cards visible: 4
+[2026-07-20 11:45:34] Mobile mini board box: {'x': 15, 'y': 315.5, 'width': 360, 'height': 362}; viewport={'width': 390, 'height': 844}
+[2026-07-20 11:45:34] Mobile page errors: []
+[2026-07-20 11:45:34] Console messages: []
+[2026-07-20 11:45:34] Page errors: []
+[2026-07-20 11:45:34] Failed requests: []

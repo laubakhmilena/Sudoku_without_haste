@@ -1,0 +1,7 @@
+$ node --check game(1).js
+exit=0
+$ static asset existence
+PASS /mnt/data/index(2).html
+PASS /mnt/data/game(1).js
+PASS /mnt/data/style(2).css
+MISSING /mnt/data/icons/icon_512x512.png

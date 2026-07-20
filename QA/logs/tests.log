@@ -1,0 +1,20 @@
+{"id": "BVT-001", "status": "PASS", "actual": "Судоку без спешки", "evidence": "evidence/BVT-001_initial_menu.png"}
+{"id": "TEST-GEN-001", "status": "PASS", "actual": "{\"ok\": true, \"testedPuzzles\": 200, \"durationMs\": 72, \"problems\": []}", "evidence": ""}
+{"id": "TC-MODE-DIAGONAL", "status": "PASS", "actual": "(81, 42, 9, 3)", "evidence": ""}
+{"id": "TC-MODE-IRREGULAR", "status": "PASS", "actual": "(81, 43, 9, 3)", "evidence": ""}
+{"id": "TC-MODE-CLASSIC", "status": "PASS", "actual": "(81, 44, 9, 4)", "evidence": ""}
+{"id": "TC-MODE-MINI", "status": "PASS", "actual": "(36, 24, 6, 4)", "evidence": ""}
+{"id": "TC-CORE-ENTRY-CORRECT", "status": "PASS", "actual": "board=7, mistakes=0", "evidence": ""}
+{"id": "TC-CORE-ENTRY-WRONG", "status": "PASS", "actual": "board=1, mistakes=1", "evidence": ""}
+{"id": "TC-CORE-UNDO", "status": "FAIL", "actual": "disabled=False, visible=False, display=none", "evidence": "evidence/BUG-001_tools_without_undo.png"}
+{"id": "TC-ACC-LIVE-REGION", "status": "FAIL", "actual": "aria-live=polite, display=none", "evidence": ""}
+{"id": "TC-INPUT-ARROWS", "status": "PASS", "actual": "before=Ряд 1, столбец 3, значение 1, ошибка; after=Ряд 1, столбец 4, значение 4, исходная клетка", "evidence": ""}
+{"id": "TC-STATE-PAUSE", "status": "PASS", "actual": "modal=True, focus=Продолжить", "evidence": ""}
+{"id": "TC-STATE-PAUSE-ESC", "status": "PASS", "actual": "modal closed via Escape", "evidence": ""}
+{"id": "TC-SAVE-RESTART", "status": "PASS", "actual": "continue=True, correct=7, wrong=1", "evidence": ""}
+{"id": "TC-SET-PERSIST", "status": "PASS", "actual": "highlight checked=False", "evidence": ""}
+{"id": "TC-COMPAT-MOBILE-390X844", "status": "PASS", "actual": "board={'x': 15, 'y': 315.5, 'width': 360, 'height': 362}; page={'sw': 390, 'sh': 844, 'vw': 390, 'vh': 844}", "evidence": "evidence/mobile-390x844.png"}
+{"id": "TC-ACC-LIVE-REGION-MOBILE", "status": "FAIL", "actual": "display=none", "evidence": ""}
+{"id": "TC-COMPAT-SMALL-320X568", "status": "PASS", "actual": "board={'x': 15, 'y': 208.515625, 'width': 290, 'height': 290}; page={'sw': 320, 'sh': 568, 'vw': 320, 'vh': 568}", "evidence": "evidence/small-320x568.png"}
+{"id": "TC-COMPAT-TABLET-800X600", "status": "PASS", "actual": "board={'x': 243, 'y': 269.90625, 'width': 314, 'height': 314}; page={'sw': 800, 'sh': 600, 'vw': 800, 'vh': 600}", "evidence": "evidence/tablet-800x600.png"}
+SUMMARY {"PASS": 16, "FAIL": 3, "BLOCKED": 0, "NOT_RUN": 0}
