@@ -3,172 +3,197 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f7f3eb">
-  <title>Судоку без спешки</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f7f3eb'/%3E%3Cellipse cx='25' cy='31' rx='8' ry='17' transform='rotate(-18 25 31)' fill='%2382b971'/%3E%3Cellipse cx='42' cy='34' rx='8' ry='17' transform='rotate(18 42 34)' fill='%2353aaa8'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=20260912-iframe-layout-v14">
+  <meta name="theme-color" content="#806fff">
+  <meta name="description" content="Крестики Нолики Хаос — четыре режима любимой игры: классический, стратегический, бесконечный и исчезающий.">
+  <title>Крестики Нолики Хаос</title>
+  <link rel="icon" href="assets/icons/star.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="is-booting" aria-busy="true">
-  <div class="app-shell" inert aria-hidden="true">
-    <header class="topbar">
-      <button class="ghost-button topbar-button" id="backButton" type="button" hidden>Назад</button>
-      <div class="brand-block" aria-hidden="true">
-        <span class="leaf-mark"></span>
-        <span>Судоку без спешки</span>
-      </div>
-      <button class="ghost-button topbar-button" id="settingsButton" type="button" aria-haspopup="dialog">Настройки</button>
-    </header>
-
-    <main class="screen-host">
-      <section class="screen menu-screen" id="menuScreen">
-        <div class="main-menu-panel">
-          <div class="menu-leaf" aria-hidden="true"></div>
-          <div class="menu-copy">
-            <h1><span>Судоку</span><span>без спешки</span></h1>
-            <p>Спокойная игра для ясного ума и хорошего настроения</p>
-          </div>
-          <div class="main-actions">
-            <button class="primary-button big-button" id="playButton" type="button">Играть</button>
-            <button class="ghost-button continue-card" id="continueButton" type="button" hidden>
-              <span>Продолжить</span>
-              <small id="continueInfo">Сохранённая партия</small>
-            </button>
-          </div>
-          <div class="menu-shortcuts" aria-label="Дополнительные разделы">
-            <button id="statsButton" type="button" class="round-action">
-              <span class="ui-icon icon-stats" aria-hidden="true"></span>
-              <span>Статистика</span>
-            </button>
-            <button id="achievementsButton" type="button" class="round-action">
-              <span class="ui-icon icon-trophy" aria-hidden="true"></span>
-              <span>Достижения</span>
-            </button>
-            <button id="menuSettingsButton" type="button" class="round-action" aria-haspopup="dialog">
-              <span class="ui-icon icon-settings" aria-hidden="true"></span>
-              <span>Настройки</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section class="screen level-screen" id="levelScreen" hidden>
-        <div class="level-heading">
-          <div>
-            <p class="eyebrow">Варианты уровней</p>
-            <h2>Выберите режим</h2>
-          </div>
-          <p>Нет спешки. Есть логика, тишина и удовольствие.</p>
-        </div>
-        <div class="mode-grid" id="modeGrid"></div>
-      </section>
-
-      <section class="screen game-screen" id="gameScreen" hidden>
-        <aside class="game-info">
-          <div class="mode-copy">
-            <span class="mode-icon mode-icon-diagonal" id="modeIcon" aria-hidden="true"></span>
-            <div>
-              <h2 id="modeTitle">Судоку</h2>
-              <p class="difficulty-chip" id="modeEyebrow">Режим</p>
-              <p class="mode-legend" id="modeLegend" hidden></p>
-            </div>
-            <p id="modeDescription">Заполните поле числами.</p>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-card stat-time">
-              <span>Время</span>
-              <strong id="timerText">00:00</strong>
-            </div>
-            <div class="stat-card stat-errors">
-              <span>Ошибки</span>
-              <strong id="mistakesText">0</strong>
-            </div>
-            <div class="stat-card stat-hints">
-              <span>Подсказки</span>
-              <strong id="hintsText">3</strong>
-            </div>
-            <div class="stat-card stat-progress">
-              <span>Прогресс</span>
-              <strong id="progressText">0%</strong>
-            </div>
-          </div>
-
-          <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Прогресс решения" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <span id="progressFill"></span>
-          </div>
-
-          <div class="tools-panel">
-            <button id="newPuzzleButton" type="button">Новая</button>
-            <button id="pauseButton" type="button">Пауза</button>
-            <button id="hintButton" type="button">Подсказка</button>
-            <button id="tutorialButton" type="button">Как играть</button>
-            <button id="undoButton" type="button">Отмена</button>
-            <button id="eraseButton" type="button">Стереть</button>
-            <button id="notesButton" type="button" aria-pressed="false">Заметки</button>
-          </div>
-          <p class="tip-text" id="tipText" aria-live="polite">Выберите клетку, затем число.</p>
-        </aside>
-
-        <section class="board-zone" aria-label="Игровое поле">
-          <div class="board-wrap">
-            <div class="sudoku-board" id="board" aria-label="Сетка судоку"></div>
-          </div>
-          <div class="number-pad" id="numberPad" aria-label="Цифры"></div>
-        </section>
-      </section>
-    </main>
-  </div>
-
-  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
-    <div class="modal-card settings-card">
-      <span class="modal-icon" id="settingsModalIcon" aria-hidden="true"></span>
-      <h2 id="settingsTitle">Настройки</h2>
-      <label class="toggle-line">
-        <input id="soundToggle" type="checkbox" checked>
-        <span>Звуковые сигналы</span>
-      </label>
-      <label class="toggle-line">
-        <input id="autoCheckToggle" type="checkbox" checked>
-        <span>Проверять ошибки сразу</span>
-      </label>
-      <label class="toggle-line">
-        <input id="highlightToggle" type="checkbox" checked>
-        <span>Подсвечивать связанные клетки</span>
-      </label>
-      <fieldset class="settings-group">
-        <legend id="textScaleLegend">Размер текста</legend>
-        <label class="scale-option">
-          <input type="radio" name="textScale" value="normal" checked>
-          <span data-text-scale-label="normal">Обычный</span>
-          <small>100%</small>
-        </label>
-        <label class="scale-option">
-          <input type="radio" name="textScale" value="large">
-          <span data-text-scale-label="large">Крупный</span>
-          <small>115%</small>
-        </label>
-        <label class="scale-option">
-          <input type="radio" name="textScale" value="xlarge">
-          <span data-text-scale-label="xlarge">Очень крупный</span>
-          <small>130%</small>
-        </label>
-      </fieldset>
-      <div class="modal-actions">
-        <button id="resetProgressButton" class="danger-button" type="button">Сбросить прогресс</button>
-        <button id="closeSettingsButton" class="primary-button" type="button">Готово</button>
-      </div>
+<body>
+  <div class="app" id="app">
+    <div class="sky-decor" aria-hidden="true">
+      <img class="cloud cloud-left" src="assets/effects/cloud-left.png" alt="">
+      <img class="cloud cloud-right" src="assets/effects/cloud-right.png" alt="">
+      <span class="spark spark-a">✦</span><span class="spark spark-b">✦</span><span class="spark spark-c">✦</span>
     </div>
+
+    <section class="screen screen-home is-active" id="homeScreen" aria-labelledby="gameLogo">
+      <button class="icon-btn settings-btn" type="button" data-action="settings" aria-label="Настройки">
+        <img src="assets/icons/settings.png" alt="">
+      </button>
+      <button class="secondary-btn home-themes-btn" type="button" data-action="themes" aria-label="Открыть темы">
+        <img src="assets/icons/sparkles.png" alt=""><span>Темы</span>
+      </button>
+      <div class="home-inner">
+        <div class="logo" id="gameLogo" aria-label="Крестики Нолики Хаос">
+          <span class="logo-top">Крестики</span>
+          <span class="logo-mid">Нолики</span>
+          <span class="logo-chaos">ХАОС</span>
+        </div>
+        <button class="primary-btn play-btn" id="playBtn" type="button">
+          <img src="assets/icons/play.png" alt=""><span>Играть</span>
+        </button>
+        <button class="pet-home-card" id="petHomeButton" type="button" data-nav="pet" aria-label="Открыть экран Кошечки Хаос">
+          <img id="petHomeImage" src="assets/pet/cat-normal.png" alt="Кошечка Хаос">
+          <span><b>Кошечка Хаос</b><small id="petHomeGift">До подарка: 10 лапок</small></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="screen" id="modesScreen" aria-labelledby="modesTitle">
+      <header class="topbar screen-header">
+        <button class="icon-btn" type="button" data-nav="home" aria-label="Назад"><img src="assets/icons/back.png" alt=""></button>
+        <div class="selected-theme-chip" id="modeThemeChip"></div>
+        <button class="icon-btn" type="button" data-action="settings" aria-label="Настройки"><img src="assets/icons/settings.png" alt=""></button>
+      </header>
+      <div class="screen-content mode-content">
+        <p class="mini-label">Крестики Нолики Хаос</p>
+        <h1 class="screen-title" id="modesTitle">Выберите режим</h1>
+        <div class="mode-grid" id="modeGrid">
+          <article class="mode-card mode-classic">
+            <button class="mode-card__button" type="button" data-mode="classic">
+              <img class="mode-card__image" src="assets/modes/classic-mode.webp" alt="Классическое поле 3 на 3 с победной линией">
+              <span class="mode-card__content"><span class="mode-card__title">Классические</span><span class="mode-card__description">Соберите 3 в ряд</span></span>
+            </button>
+          </article>
+          <article class="mode-card mode-strategic">
+            <button class="mode-card__button" type="button" data-mode="strategic">
+              <img class="mode-card__image" src="assets/modes/strategic-mode.webp" alt="Стратегическое поле из девяти связанных малых полей">
+              <span class="mode-card__content"><span class="mode-card__title">Стратегические</span><span class="mode-card__description">Побеждайте на малых полях</span></span>
+            </button>
+          </article>
+          <article class="mode-card mode-infinite">
+            <button class="mode-card__button" type="button" data-mode="infinite">
+              <img class="mode-card__image" src="assets/modes/infinite-mode.webp" alt="Большое поле с подсвеченной линией из пяти знаков">
+              <span class="mode-card__content"><span class="mode-card__title">Бесконечные</span><span class="mode-card__description">Соберите 5 подряд</span></span>
+            </button>
+          </article>
+          <article class="mode-card mode-disappearing">
+            <button class="mode-card__button" type="button" data-mode="disappearing">
+              <img class="mode-card__image" src="assets/modes/disappearing-mode.webp" alt="Поле с растворяющимся старым знаком">
+              <span class="mode-card__content"><span class="mode-card__title">Исчезающие</span><span class="mode-card__description">Четвёртый знак удаляет первый</span></span>
+            </button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen pet-screen" id="petScreen" aria-labelledby="petTitle">
+      <header class="topbar screen-header">
+        <button class="icon-btn" type="button" data-nav="home" aria-label="Назад"><img src="assets/icons/back.png" alt=""></button>
+        <div class="pet-heading"><p class="mini-label">Постоянный питомец</p><h1 id="petTitle">Кошечка Хаос</h1></div>
+        <button class="icon-btn" type="button" data-action="settings" aria-label="Настройки"><img src="assets/icons/settings.png" alt=""></button>
+      </header>
+      <div class="pet-content">
+        <div class="pet-stage" aria-live="polite">
+          <div class="pet-heart" id="petHeart" aria-hidden="true">♥</div>
+          <div class="pet-figure" id="petFigure" data-mood="normal">
+            <img class="pet-character" id="petCharacter" src="assets/pet/cat-normal.png" alt="Кошечка Хаос">
+          </div>
+          <p class="pet-reaction" id="petReaction">Я всегда рядом!</p>
+        </div>
+        <div class="pet-dashboard">
+          <section class="pet-panel pet-progress-panel" aria-label="Дружба">
+            <div class="pet-level"><b id="petLevel">Уровень дружбы: 1</b><span id="petPointsLabel">Лапки: 0 из 10</span></div>
+            <div class="progress-bar pet-progress"><span id="petProgressBar"></span></div>
+            <div class="pet-vitals" aria-label="Состояние питомца">
+              <div class="pet-vital"><div><span>Сытость</span><b id="petHungerLabel">80 из 100</b></div><div class="progress-bar pet-vital-bar"><span id="petHungerBar"></span></div></div>
+              <div class="pet-vital"><div><span>Настроение</span><b id="petMoodLabel">75 из 100</b></div><div class="progress-bar pet-vital-bar"><span id="petMoodBar"></span></div></div>
+            </div>
+            <button class="pet-chest" id="petChestButton" type="button" data-pet-action="chest" disabled>
+              <img id="petChestImage" src="assets/pet/chest-closed.png" alt=""><span id="petChestLabel">Сундук заботы пока не готов</span>
+            </button>
+          </section>
+          <section class="pet-panel">
+            <h2>Задание дня</h2>
+            <p id="petQuestText"></p>
+            <div class="progress-bar"><span id="petQuestProgress"></span></div>
+            <small id="petQuestLabel"></small>
+            <button class="secondary-btn pet-daily-game-btn" id="petDailyGameButton" type="button" data-pet-action="puzzle" aria-label="Игра дня">
+              <span>Игра дня</span><small id="petDailyGameStatus">Награда доступна</small>
+            </button>
+          </section>
+          <section class="pet-panel">
+            <h2>Угощения</h2>
+            <div class="pet-food-grid" id="petFoodGrid"></div>
+            <div class="pet-actions">
+              <button class="primary-btn pet-action-btn" id="petFeedButton" type="button" data-pet-action="feed">Покормить</button>
+              <button class="secondary-btn pet-action-btn" type="button" data-pet-action="pet">Погладить</button>
+            </div>
+             <button class="secondary-btn pet-rewarded" id="petRewardedButton" type="button" data-pet-action="rewarded" hidden>Посмотреть рекламу — получить печенье и +2 лапки</button>
+          </section>
+      <section class="pet-panel">
+        <h2>Настроения</h2>
+        <div class="pet-mood-preview" id="petMoodPreview" aria-live="polite" aria-label="Выбранное настроение"></div>
+        <div class="pet-moods" id="petMoods"></div>
+      </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="setupScreen" aria-labelledby="setupTitle">
+      <header class="topbar screen-header">
+        <button class="icon-btn" type="button" data-nav="modes" aria-label="Назад"><img src="assets/icons/back.png" alt=""></button>
+        <div class="selected-theme-chip" id="setupThemeChip"></div>
+        <button class="icon-btn" type="button" data-action="settings" aria-label="Настройки"><img src="assets/icons/settings.png" alt=""></button>
+      </header>
+      <div class="screen-content setup-content">
+        <img class="setup-art" id="setupArt" src="assets/modes/classic.png" alt="">
+        <h1 id="setupTitle">Классические</h1>
+        <p class="setup-description" id="setupDescription"></p>
+        <fieldset class="choice-group">
+          <legend>Соперник</legend>
+          <button class="choice-card is-selected" type="button" data-opponent="bot">
+            <img src="assets/icons/bot.png" alt=""><span><b>Против компьютера</b><small>Три уровня сложности</small></span>
+          </button>
+          <button class="choice-card" type="button" data-opponent="friend">
+            <img src="assets/icons/players.png" alt=""><span><b>С другом</b><small>На одном устройстве</small></span>
+          </button>
+        </fieldset>
+        <fieldset class="difficulty-group" id="difficultyGroup">
+          <legend>Сложность</legend>
+          <div class="segmented">
+            <button type="button" data-difficulty="easy">Легко</button>
+            <button class="is-selected" type="button" data-difficulty="medium">Средне</button>
+            <button type="button" data-difficulty="hard">Сложно</button>
+          </div>
+        </fieldset>
+        <button class="primary-btn start-match-btn" id="startMatchBtn" type="button" aria-label="Начать">Начать</button>
+      </div>
+    </section>
+
+    <section class="screen game-screen" id="gameScreen" aria-labelledby="gameTitle">
+      <header class="topbar game-topbar screen-header">
+        <button class="icon-btn" type="button" data-action="leave-game" aria-label="Назад"><img src="assets/icons/back.png" alt=""></button>
+        <div class="game-heading"><h1 id="gameTitle">Классические</h1><div class="turn-chip" id="turnChip" aria-live="polite"></div></div>
+        <button class="icon-btn" type="button" data-action="settings" aria-label="Настройки"><img src="assets/icons/settings.png" alt=""></button>
+      </header>
+      <div class="game-body">
+        <div class="score-strip" id="scoreStrip"></div>
+        <p class="mode-hint" id="modeHint"></p>
+        <div class="board-shell" id="boardShell">
+          <div id="boardHost"></div>
+          <canvas id="infiniteCanvas" tabindex="0" role="application" aria-label="Бесконечное поле крестиков-ноликов. Стрелками выберите клетку, Enter или пробел поставьте знак"></canvas>
+        </div>
+        <div class="canvas-tools" id="canvasTools" aria-label="Управление бесконечным полем">
+          <button class="icon-btn" type="button" data-canvas="zoom-in" aria-label="Увеличить"><img src="assets/icons/zoom-in.png" alt=""></button>
+          <button class="icon-btn" type="button" data-canvas="zoom-out" aria-label="Уменьшить"><img src="assets/icons/zoom-out.png" alt=""></button>
+          <button class="icon-btn" type="button" data-canvas="center" aria-label="К последнему ходу"><img src="assets/icons/center.png" alt=""></button>
+        </div>
+        <div class="game-actions">
+          <button class="secondary-btn" type="button" data-action="restart"><img src="assets/icons/restart.png" alt="">Заново</button>
+          <button class="secondary-btn" type="button" data-action="rules"><img src="assets/icons/tip.png" alt="">Правила</button>
+          <button class="secondary-btn" type="button" data-action="menu"><img src="assets/icons/home.png" alt="">Меню</button>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div class="modal" id="messageModal" role="dialog" aria-modal="true" aria-labelledby="messageTitle" hidden>
-    <div class="modal-card">
-      <span class="modal-icon" id="messageModalIcon" aria-hidden="true"></span>
-      <h2 id="messageTitle">Пауза</h2>
-      <div class="message-text" id="messageText">Игра приостановлена.</div>
-      <div class="modal-actions" id="messageActions"></div>
-    </div>
+  <div class="modal-layer" id="modalLayer" aria-hidden="true">
+    <div class="modal-backdrop" data-action="modal-backdrop"></div>
+    <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section>
   </div>
-
-  <script src="game.js?v=20260912-iframe-layout-v14"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
 </body>
 </html>
