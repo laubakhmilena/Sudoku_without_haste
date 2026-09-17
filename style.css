@@ -24,7 +24,16 @@
   --radius-md: 16px;
   --radius-sm: 12px;
   --speed: 160ms ease;
+  --ui-font-scale: 1;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+:root[data-text-scale="large"] {
+  --ui-font-scale: 1.15;
+}
+
+:root[data-text-scale="xlarge"] {
+  --ui-font-scale: 1.3;
 }
 
 * {
@@ -43,6 +52,28 @@ body {
   overflow: hidden;
 }
 
+/* Keep the static fallback markup unavailable until SDK language, saves and UI are ready. */
+body.is-booting .app-shell {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The whole iframe is a game surface: browser selection/callouts are never useful here. */
+body,
+.app-shell,
+.modal {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+img,
+svg {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 body {
   background:
     radial-gradient(circle at 8% 9%, rgba(53, 170, 168, 0.13), transparent 25%),
@@ -50,6 +81,7 @@ body {
     radial-gradient(circle at 4% 95%, rgba(91, 157, 238, 0.12), transparent 26%),
     linear-gradient(135deg, #fbf7ef 0%, var(--background) 100%);
   color: var(--text-primary);
+  font-size: calc(16px * var(--ui-font-scale));
 }
 
 button,
@@ -339,7 +371,11 @@ body[data-screen="game"] .brand-block {
   display: grid;
   color: #477470;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(38px, 7vw, 72px);
+  font-size: clamp(
+    calc(38px * var(--ui-font-scale)),
+    calc(7vw * var(--ui-font-scale)),
+    calc(72px * var(--ui-font-scale))
+  );
   font-weight: 500;
   line-height: 0.92;
   letter-spacing: 0;
@@ -348,7 +384,7 @@ body[data-screen="game"] .brand-block {
 .menu-copy p {
   max-width: 360px;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: calc(16px * var(--ui-font-scale));
   line-height: 1.55;
 }
 
@@ -365,7 +401,7 @@ body[data-screen="game"] .brand-block {
 .big-button {
   min-height: 70px;
   border-radius: 18px;
-  font-size: 22px;
+  font-size: calc(22px * var(--ui-font-scale));
 }
 
 .continue-card {
@@ -393,7 +429,7 @@ body[data-screen="game"] .brand-block {
 .continue-card small {
   justify-self: start;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
 }
 
 .menu-shortcuts {
@@ -415,7 +451,7 @@ body[data-screen="game"] .brand-block {
   border: 0;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
 }
 
 .round-action .ui-icon,
@@ -469,7 +505,7 @@ body[data-screen="game"] .brand-block {
 
 .eyebrow {
   color: var(--accent);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -479,7 +515,11 @@ body[data-screen="game"] .brand-block {
   margin-top: 4px;
   color: var(--text-primary);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(
+    calc(28px * var(--ui-font-scale)),
+    calc(4vw * var(--ui-font-scale)),
+    calc(42px * var(--ui-font-scale))
+  );
   font-weight: 500;
 }
 
@@ -522,13 +562,17 @@ body[data-screen="game"] .brand-block {
 .mode-card h3 {
   color: var(--text-primary);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(
+    calc(24px * var(--ui-font-scale)),
+    calc(3vw * var(--ui-font-scale)),
+    calc(32px * var(--ui-font-scale))
+  );
   font-weight: 500;
 }
 
 .mode-card p {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: calc(14px * var(--ui-font-scale));
   line-height: 1.45;
 }
 
@@ -606,7 +650,7 @@ body[data-screen="game"] .brand-block {
   border-radius: 999px;
   color: var(--accent);
   background: var(--accent-soft);
-  font-size: 13px;
+  font-size: calc(13px * var(--ui-font-scale));
   font-weight: 750;
 }
 
@@ -633,7 +677,7 @@ body[data-screen="game"] .brand-block {
   border-radius: 14px;
   background: rgba(243, 240, 233, 0.72);
   color: #4f625f !important;
-  font-size: 13px !important;
+  font-size: calc(13px * var(--ui-font-scale)) !important;
   line-height: 1.28 !important;
 }
 
@@ -648,7 +692,7 @@ body[data-screen="game"] .brand-block {
   border-radius: 999px;
   background: var(--surface-secondary);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 750;
 }
 
@@ -692,7 +736,7 @@ body[data-screen="game"] .brand-block {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-hover);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 850;
 }
 
@@ -742,26 +786,29 @@ body[data-screen="game"] .brand-block {
 .mode-copy > p {
   grid-column: 1 / -1;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   line-height: 1.28;
 }
 
 .mode-copy .mode-legend {
   margin: 6px 0 0;
   color: var(--accent);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 750;
   line-height: 1.25;
 }
 
 .mode-copy h2 {
-  overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--text-primary);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(22px, 2.6vw, 34px);
+  font-size: clamp(
+    calc(22px * var(--ui-font-scale)),
+    calc(2.6vw * var(--ui-font-scale)),
+    calc(34px * var(--ui-font-scale))
+  );
   font-weight: 500;
   line-height: 1;
-  text-overflow: ellipsis;
 }
 
 .stats-grid {
@@ -826,13 +873,13 @@ body[data-screen="game"] .brand-block {
 .stat-card span {
   display: block;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: calc(13px * var(--ui-font-scale));
 }
 
 .stat-card strong {
   display: block;
   margin-top: 3px;
-  font-size: 20px;
+  font-size: calc(20px * var(--ui-font-scale));
   font-weight: 750;
 }
 
@@ -864,10 +911,6 @@ body[data-screen="game"] .brand-block {
   min-width: 0;
   overflow-x: hidden;
   overflow-y: hidden;
-}
-
-#undoButton {
-  display: none;
 }
 
 .tools-panel button {
@@ -1032,8 +1075,11 @@ body[data-screen="game"] .brand-block {
 
 .sudoku-board {
   display: grid;
+  grid-auto-rows: minmax(0, 1fr);
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1;
   border: 2px solid rgba(56, 126, 122, 0.74);
   border-radius: 15px;
   background: rgba(56, 126, 122, 0.55);
@@ -1133,7 +1179,11 @@ body[data-screen="game"] .brand-block {
 .value {
   position: relative;
   z-index: 1;
-  font-size: clamp(20px, 5.2vmin, 42px);
+  font-size: clamp(
+    20px,
+    calc(5.2vmin * var(--ui-font-scale)),
+    calc(42px * var(--ui-font-scale))
+  );
 }
 
 .notes {
@@ -1176,7 +1226,11 @@ body[data-screen="game"] .brand-block {
   border-radius: 14px;
   background: #fffdfa;
   color: #1f2f2f;
-  font-size: clamp(22px, 3.6vmin, 32px);
+  font-size: clamp(
+    22px,
+    calc(3.6vmin * var(--ui-font-scale)),
+    calc(32px * var(--ui-font-scale))
+  );
   font-weight: 700;
   box-shadow: var(--soft-shadow);
 }
@@ -1277,7 +1331,7 @@ body[data-screen="game"] .brand-block {
 
 .modal-card h2 {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 32px;
+  font-size: calc(32px * var(--ui-font-scale));
   font-weight: 500;
 }
 
@@ -1298,7 +1352,7 @@ body[data-screen="game"] .brand-block {
 .achievement-unlocked-title {
   margin-top: 14px;
   color: var(--accent);
-  font-size: 13px;
+  font-size: calc(13px * var(--ui-font-scale));
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1406,18 +1460,18 @@ body[data-screen="game"] .brand-block {
 
 .achievement-copy strong {
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: calc(15px * var(--ui-font-scale));
 }
 
 .achievement-copy span {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: calc(13px * var(--ui-font-scale));
   line-height: 1.35;
 }
 
 .achievement-copy small {
   color: var(--accent);
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 800;
 }
 
@@ -1434,13 +1488,13 @@ body[data-screen="game"] .brand-block {
 .tutorial-block strong {
   margin-top: 5px;
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: calc(18px * var(--ui-font-scale));
   line-height: 1.2;
 }
 
 .tutorial-block span {
   color: var(--text-secondary);
-  font-size: 15px;
+  font-size: calc(15px * var(--ui-font-scale));
   line-height: 1.5;
 }
 
@@ -1451,7 +1505,7 @@ body[data-screen="game"] .brand-block {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent) !important;
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-font-scale));
   font-weight: 850;
 }
 
@@ -1513,19 +1567,23 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: clamp(22px, 2.4vw, 30px);
+    font-size: clamp(
+      calc(22px * var(--ui-font-scale)),
+      calc(2.4vw * var(--ui-font-scale)),
+      calc(30px * var(--ui-font-scale))
+    );
   }
 
   .mode-copy .mode-legend {
     margin-top: 2px;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
     line-height: 1.15;
   }
 
   .mode-copy > p {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
     line-height: 1.18;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -1559,13 +1617,23 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
     line-height: 1.05;
   }
 
   .stat-card strong {
     margin-top: 1px;
-    font-size: 16px;
+    font-size: calc(16px * var(--ui-font-scale));
+  }
+
+  .stat-card {
+    padding: 2px 4px;
+    text-align: center;
+  }
+
+  .stat-card::before,
+  .stat-card::after {
+    display: none;
   }
 
   .progress-track {
@@ -1579,7 +1647,7 @@ body[data-screen="game"] .brand-block {
   .tools-panel button {
     min-height: 44px;
     padding: 5px 10px 5px 44px;
-    font-size: 14px;
+    font-size: calc(14px * var(--ui-font-scale));
   }
 
   .tools-panel button.has-svg {
@@ -1660,11 +1728,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-font-scale));
   }
 
   .stat-card strong {
-    font-size: 16px;
+    font-size: calc(16px * var(--ui-font-scale));
   }
 
   .tools-panel {
@@ -1677,7 +1745,7 @@ body[data-screen="game"] .brand-block {
     min-height: 44px;
     padding: 6px;
     text-align: center;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .tools-panel button::before,
@@ -1716,6 +1784,17 @@ body[data-screen="game"] .brand-block {
   }
 }
 
+@media (min-width: 561px) and (max-width: 900px) and (min-height: 541px) {
+  .sudoku-board.board-size-9 .value {
+    font-size: clamp(
+      18px,
+      calc(4.1vmin * var(--ui-font-scale)),
+      calc(34px * var(--ui-font-scale))
+    );
+    line-height: 1;
+  }
+}
+
 @media (max-width: 560px) {
   .topbar {
     grid-template-columns: 58px 1fr 92px;
@@ -1726,7 +1805,7 @@ body[data-screen="game"] .brand-block {
   .topbar-button {
     min-height: 44px;
     padding: 0 8px;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .main-menu-panel {
@@ -1748,13 +1827,17 @@ body[data-screen="game"] .brand-block {
   .menu-copy h1 {
     width: 100%;
     max-width: 100%;
-    font-size: clamp(34px, 12vw, 46px);
+    font-size: clamp(
+      calc(34px * var(--ui-font-scale)),
+      calc(12vw * var(--ui-font-scale)),
+      calc(46px * var(--ui-font-scale))
+    );
     overflow-wrap: anywhere;
   }
 
   .menu-copy p {
     max-width: 100%;
-    font-size: 14px;
+    font-size: calc(14px * var(--ui-font-scale));
   }
 
   .big-button {
@@ -1766,7 +1849,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .round-action {
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
   }
 
   .round-action .ui-icon,
@@ -1782,7 +1865,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .level-heading > p {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
   }
 
   .mode-grid {
@@ -1812,7 +1895,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: 23px;
+    font-size: calc(23px * var(--ui-font-scale));
   }
 
   .stats-grid {
@@ -1829,6 +1912,11 @@ body[data-screen="game"] .brand-block {
 
   .value {
     font-size: clamp(18px, 8vw, 34px);
+  }
+
+  .sudoku-board.board-size-9 .value {
+    font-size: clamp(12px, 5vw, 20px);
+    line-height: 1;
   }
 }
 
@@ -1883,16 +1971,16 @@ body[data-screen="game"] .brand-block {
   }
 
   .level-heading .eyebrow {
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-font-scale));
   }
 
   .level-heading h2 {
-    font-size: 25px;
+    font-size: calc(25px * var(--ui-font-scale));
     line-height: 1;
   }
 
   .level-heading > p {
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
     line-height: 1.25;
   }
 
@@ -1944,7 +2032,7 @@ body[data-screen="game"] .brand-block {
     grid-area: title;
     align-self: end;
     min-width: 0;
-    font-size: 21px;
+    font-size: calc(21px * var(--ui-font-scale));
     line-height: 1;
     overflow-wrap: anywhere;
   }
@@ -1964,7 +2052,7 @@ body[data-screen="game"] .brand-block {
 
   .mode-actions button {
     min-height: 44px;
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
   }
 
   .mode-actions .secondary-mode-button {
@@ -2011,13 +2099,13 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: 20px;
+    font-size: calc(20px * var(--ui-font-scale));
   }
 
   .difficulty-chip {
     min-height: 20px;
     padding: 1px 8px;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
   }
 
   .stats-grid {
@@ -2031,11 +2119,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 9px;
+    font-size: calc(9px * var(--ui-font-scale));
   }
 
   .stat-card strong {
-    font-size: 14px;
+    font-size: calc(14px * var(--ui-font-scale));
   }
 
   .progress-track {
@@ -2044,7 +2132,7 @@ body[data-screen="game"] .brand-block {
 
   .tools-panel button {
     min-height: 44px;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
   }
 
   .tools-panel button.has-svg {
@@ -2117,7 +2205,7 @@ body[data-screen="game"] .brand-block {
   .number-pad button {
     min-height: 44px;
     height: 44px;
-    font-size: 20px;
+    font-size: calc(20px * var(--ui-font-scale));
   }
 }
 
@@ -2131,11 +2219,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .level-heading h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--ui-font-scale));
   }
 
   .level-heading > p {
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
     line-height: 1.15;
   }
 
@@ -2155,7 +2243,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-card h3 {
-    font-size: 20px;
+    font-size: calc(20px * var(--ui-font-scale));
   }
 
   .game-info {
@@ -2169,14 +2257,14 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: 20px;
+    font-size: calc(20px * var(--ui-font-scale));
     line-height: 0.95;
   }
 
   .difficulty-chip {
     min-height: 18px;
     padding: 0 7px;
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-font-scale));
   }
 
   .stats-grid {
@@ -2189,12 +2277,12 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 8px;
+    font-size: calc(8px * var(--ui-font-scale));
     line-height: 1;
   }
 
   .stat-card strong {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
     line-height: 1.05;
   }
 
@@ -2233,7 +2321,8 @@ body[data-screen="game"] .brand-block {
   }
 }
 
-@media (orientation: landscape) and (max-height: 540px) {
+@media (orientation: landscape) and (max-height: 540px),
+  (min-width: 561px) and (max-width: 900px) and (orientation: landscape) and (max-height: 800px) {
   .app-shell {
     padding:
       max(3px, env(safe-area-inset-top))
@@ -2278,7 +2367,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .menu-copy h1 {
-    font-size: clamp(30px, 8vw, 46px);
+    font-size: clamp(
+      calc(30px * var(--ui-font-scale)),
+      calc(8vw * var(--ui-font-scale)),
+      calc(46px * var(--ui-font-scale))
+    );
   }
 
   .main-actions {
@@ -2311,12 +2404,12 @@ body[data-screen="game"] .brand-block {
   }
 
   .level-heading h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--ui-font-scale));
   }
 
   .level-heading > p {
     max-width: none;
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
     line-height: 1.25;
   }
 
@@ -2340,7 +2433,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-card h3 {
-    font-size: 18px;
+    font-size: calc(18px * var(--ui-font-scale));
   }
 
   .mode-card p:not(.mode-rules) {
@@ -2354,7 +2447,7 @@ body[data-screen="game"] .brand-block {
 
   .mode-actions button {
     min-height: 44px;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .mode-actions .mode-tutorial {
@@ -2393,13 +2486,13 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: 17px;
+    font-size: calc(17px * var(--ui-font-scale));
   }
 
   .difficulty-chip {
     min-height: 20px;
     padding: 1px 8px;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
   }
 
   .stats-grid {
@@ -2413,11 +2506,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 9px;
+    font-size: calc(9px * var(--ui-font-scale));
   }
 
   .stat-card strong {
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-font-scale));
   }
 
   .progress-track {
@@ -2425,7 +2518,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .tools-panel {
-    grid-template-columns: repeat(3, minmax(44px, 1fr));
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
     gap: 4px;
   }
 
@@ -2504,7 +2597,7 @@ body[data-screen="game"] .brand-block {
   .number-pad button {
     min-height: 44px;
     height: 44px;
-    font-size: 16px;
+    font-size: calc(16px * var(--ui-font-scale));
   }
 
   .modal-card:has(.tutorial-block) {
@@ -2528,7 +2621,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .modal-card:has(.tutorial-block) h2 {
-    font-size: 25px;
+    font-size: calc(25px * var(--ui-font-scale));
     line-height: 1.05;
   }
 
@@ -2546,17 +2639,17 @@ body[data-screen="game"] .brand-block {
 
   .tutorial-chip {
     padding: 2px 8px;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-font-scale));
   }
 
   .tutorial-block strong {
     margin-top: 2px;
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-font-scale));
     line-height: 1.12;
   }
 
   .tutorial-block span {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
     line-height: 1.3;
   }
 
@@ -2568,7 +2661,192 @@ body[data-screen="game"] .brand-block {
   .modal-card:has(.tutorial-block) .modal-actions button {
     min-height: 40px;
     padding-inline: 14px;
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
+  }
+}
+
+@media (orientation: landscape) and (min-width: 700px) and (max-width: 1000px) and (max-height: 330px) {
+  .game-screen {
+    grid-template-columns: minmax(228px, 245px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 16px;
+  }
+
+  .game-info {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 44px 7px 44px;
+    grid-template-areas:
+      "mode"
+      "stats"
+      "progress"
+      "tools";
+    gap: 4px;
+    min-width: 0;
+    min-height: 0;
+    padding: 4px 6px;
+    overflow: visible;
+  }
+
+  .mode-copy {
+    grid-area: mode;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .mode-copy .mode-icon,
+  .mode-copy .mode-legend {
+    display: none;
+  }
+
+  .mode-copy h2 {
+    min-width: 0;
+    font-size: calc(18px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .mode-copy > p:not(.mode-legend) {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    font-size: calc(8px * var(--ui-font-scale));
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .difficulty-chip {
+    min-height: 18px;
+    width: fit-content;
+    padding: 0 7px;
+    font-size: calc(10px * var(--ui-font-scale));
+    line-height: 1.2;
+  }
+
+  .stats-grid {
+    grid-area: stats;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-content: start;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .stat-card {
+    min-width: 0;
+    min-height: 34px;
+    padding: 1px 2px;
+    text-align: center;
+  }
+
+  .stat-card::before,
+  .stat-card::after {
+    display: none;
+  }
+
+  .stat-card span {
+    font-size: calc(9px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .stat-card strong {
+    margin-top: 2px;
+    font-size: calc(14px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .progress-track {
+    grid-area: progress;
+    align-self: center;
+    width: 100%;
+    height: 7px;
+  }
+
+  .tools-panel {
+    grid-area: tools;
+    grid-template-columns: repeat(5, minmax(44px, 1fr));
+    grid-template-rows: 44px;
+    align-content: start;
+    gap: 2px;
+    min-width: 0;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .tools-panel #newPuzzleButton,
+  .tools-panel #tutorialButton {
+    display: none;
+  }
+
+  .tools-panel button {
+    width: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    height: 44px;
+    justify-content: center;
+    padding: 4px;
+    text-align: center;
+    font-size: 0;
+  }
+
+  .board-zone {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 148px);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: center;
+    justify-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 0;
+    padding: 4px;
+    overflow: visible;
+  }
+
+  .board-wrap {
+    --board-size: min(calc(100dvh - 58px), 236px);
+    width: auto;
+    height: min(var(--board-size), 100%);
+    aspect-ratio: 1;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 3px;
+  }
+
+  .sudoku-board.board-size-9 .value {
+    font-size: max(
+      12px,
+      min(
+        calc(
+          clamp(12px, calc(var(--board-size) / 11), 15px)
+          + (var(--ui-font-scale) - 1) * 4px
+        ),
+        calc(var(--board-size) / 10.2)
+      )
+    );
+    line-height: 1;
+  }
+
+  .number-pad,
+  .number-pad.pad-size-9,
+  .number-pad.pad-size-6 {
+    align-self: center;
+    justify-self: center;
+    width: 140px;
+    max-width: 100%;
+    gap: 4px;
+    grid-template-columns: repeat(3, 44px);
+    grid-auto-rows: 44px;
+  }
+
+  .number-pad button {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: calc(16px * var(--ui-font-scale));
   }
 }
 
@@ -2589,14 +2867,18 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: clamp(18px, 5.8vw, 20px);
+    font-size: clamp(
+      calc(18px * var(--ui-font-scale)),
+      calc(5.8vw * var(--ui-font-scale)),
+      calc(20px * var(--ui-font-scale))
+    );
     line-height: 0.95;
   }
 
   .difficulty-chip {
     min-height: 18px;
     padding: 0 7px;
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-font-scale));
   }
 
   .stats-grid {
@@ -2614,12 +2896,12 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 8px;
+    font-size: calc(8px * var(--ui-font-scale));
     line-height: 1;
   }
 
   .stat-card strong {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
     line-height: 1.05;
   }
 
@@ -2674,11 +2956,11 @@ body[data-screen="game"] .brand-block {
   }
 
   .level-heading h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--ui-font-scale));
   }
 
   .level-heading > p {
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .mode-card {
@@ -2700,7 +2982,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-card h3 {
-    font-size: 19px;
+    font-size: calc(19px * var(--ui-font-scale));
   }
 
   .mode-card p:not(.mode-rules) {
@@ -2709,7 +2991,7 @@ body[data-screen="game"] .brand-block {
 
   .mode-actions button {
     min-height: 44px;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .game-info {
@@ -2718,7 +3000,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .mode-copy h2 {
-    font-size: 19px;
+    font-size: calc(19px * var(--ui-font-scale));
   }
 
   .difficulty-chip {
@@ -2732,7 +3014,8 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card span {
-    font-size: 8px;
+    font-size: calc(9px * var(--ui-font-scale));
+    line-height: 1.05;
   }
 
   .tools-panel button {
@@ -2746,7 +3029,7 @@ body[data-screen="game"] .brand-block {
   }
 
   .stat-card strong {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
   }
 
   .board-zone {
@@ -2806,7 +3089,7 @@ button,
     white-space: normal;
     overflow: visible;
     text-align: center;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
     line-height: 1.2;
   }
 
@@ -2847,7 +3130,7 @@ button,
   }
 
   .modal-card:has(.achievement-list) h2 {
-    font-size: 28px;
+    font-size: calc(28px * var(--ui-font-scale));
     line-height: 1;
   }
 
@@ -2883,7 +3166,7 @@ button,
   }
 
   .modal-card:has(.achievement-list) .achievement-copy strong {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-font-scale));
     line-height: 1.15;
   }
 
@@ -2892,7 +3175,7 @@ button,
   }
 
   .modal-card:has(.achievement-list) .achievement-copy small {
-    font-size: 10.5px;
+    font-size: calc(10.5px * var(--ui-font-scale));
     line-height: 1.2;
   }
 
@@ -2922,7 +3205,11 @@ button,
   }
 
   .menu-copy h1 {
-    font-size: clamp(30px, 10.5vw, 40px) !important;
+    font-size: clamp(
+      calc(30px * var(--ui-font-scale)),
+      calc(10.5vw * var(--ui-font-scale)),
+      calc(40px * var(--ui-font-scale))
+    ) !important;
     line-height: 0.98;
     text-align: center;
   }
@@ -2952,7 +3239,7 @@ button,
   }
 
   .modal-card:has(.achievement-list) h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--ui-font-scale));
   }
 
   .modal-card:has(.achievement-list) .achievement-list {
@@ -2977,10 +3264,509 @@ button,
   }
 
   .modal-card:has(.achievement-list) .achievement-copy strong {
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-font-scale));
   }
 
   .modal-card:has(.achievement-list) .achievement-copy small {
-    font-size: 9.5px;
+    font-size: calc(9.5px * var(--ui-font-scale));
+  }
+}
+
+/*
+ * Android/Yandex portrait rendering fallback.
+ * Keep the narrow layout on ordinary CSS layers: some mobile GPU/WebView
+ * combinations retain stale tiles when a fixed/dynamic-viewport layer is
+ * combined with backdrop filters and translucent surfaces.
+ */
+@media (max-width: 900px) and (orientation: portrait) {
+  html,
+  body {
+    height: 100%;
+  }
+
+  .app-shell {
+    height: 100%;
+  }
+
+  .level-screen {
+    height: 100%;
+  }
+
+  .main-menu-panel {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+  }
+
+  .topbar-button,
+  body[data-screen="game"] .brand-block {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .level-heading,
+  .mode-card,
+  .game-screen,
+  .game-info {
+    background: var(--surface);
+  }
+
+  .game-screen,
+  .board-zone {
+    overflow: visible;
+  }
+
+  .game-screen {
+    box-shadow: none;
+  }
+
+  .modal {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.settings-card,
+.settings-group,
+.scale-option,
+.level-heading,
+.mode-card,
+.game-info,
+.modal-card {
+  min-width: 0;
+}
+
+.settings-group {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-group legend {
+  width: 100%;
+  margin-bottom: 2px;
+  padding: 0;
+  color: var(--text-primary);
+  font-size: calc(14px * var(--ui-font-scale));
+  font-weight: 800;
+}
+
+.scale-option {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.scale-option:has(input:checked) {
+  border-color: rgba(28, 124, 122, 0.48);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.scale-option input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.scale-option span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 750;
+}
+
+.scale-option small {
+  color: var(--text-secondary);
+  font-size: calc(12px * var(--ui-font-scale));
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.level-heading h2,
+.level-heading > p,
+.mode-card h3,
+.mode-card p,
+.mode-rules,
+.mode-actions button,
+.tools-panel button,
+.modal-card h2,
+.modal-card p,
+.message-text,
+.achievement-copy strong,
+.achievement-copy span,
+.achievement-copy small,
+.tutorial-block strong,
+.tutorial-block span {
+  overflow-wrap: anywhere;
+}
+
+.mode-actions button,
+.tools-panel button,
+.modal-actions button {
+  white-space: normal;
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .main-menu-panel {
+    overflow: visible;
+  }
+
+  .modal-card:has(.tutorial-block),
+  .modal-card:has(.achievement-list) {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 560px) and (max-height: 760px) and (orientation: portrait) {
+  .mode-copy > div {
+    line-height: 1;
+  }
+
+  .stat-card {
+    padding-block: 0;
+  }
+}
+
+@media (max-width: 340px) and (max-height: 760px) and (orientation: portrait) {
+  .game-info {
+    grid-template-rows: 47px 36px 6px 91px;
+  }
+}
+
+@media (min-width: 341px) and (max-width: 560px) and (max-height: 760px) and (orientation: portrait) {
+  .game-info {
+    grid-template-rows: 47px 32px 6px 91px;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 900px) and (max-height: 280px) and (orientation: landscape) {
+  .level-heading {
+    gap: 8px;
+    padding: 5px 10px;
+  }
+
+  .level-heading .eyebrow {
+    font-size: calc(9px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .level-heading h2 {
+    font-size: calc(20px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .level-heading > p {
+    font-size: calc(11px * var(--ui-font-scale));
+    line-height: 1.1;
+  }
+
+  .mode-grid {
+    gap: 6px;
+    padding: 0 0 8px;
+  }
+
+  .mode-card {
+    grid-template-columns: 30px minmax(0, 1fr) minmax(68px, 0.8fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "icon title actions"
+      "icon chip actions";
+    align-items: center;
+    gap: 2px 6px;
+    min-height: 0;
+    padding: 6px;
+  }
+
+  .mode-topline {
+    display: contents;
+  }
+
+  .mode-topline .mode-icon {
+    grid-area: icon;
+    width: 30px;
+    height: 30px;
+  }
+
+  .current-label,
+  .mode-rules,
+  .mode-meta,
+  .mode-card p:not(.mode-rules) {
+    display: none;
+  }
+
+  .mode-card h3 {
+    grid-area: title;
+    min-width: 0;
+    font-size: calc(12px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .mode-card .difficulty-chip {
+    grid-area: chip;
+    min-height: 16px;
+    padding: 0 5px;
+    font-size: calc(8px * var(--ui-font-scale));
+    line-height: 1;
+  }
+
+  .mode-actions {
+    grid-area: actions;
+    align-self: center;
+    align-content: center;
+    min-width: 0;
+    gap: 0;
+  }
+
+  .mode-actions .mode-play {
+    height: 44px;
+    min-height: 44px;
+    padding-inline: 5px;
+    gap: 4px;
+    font-size: calc(10px * var(--ui-font-scale));
+  }
+
+  .mode-actions .mode-tutorial {
+    display: none;
+  }
+}
+
+/* On narrow portrait devices the text-size setting also enlarges playable digits.
+   Board cells and keypad buttons keep their geometry and touch targets. */
+@media (max-width: 560px) and (orientation: portrait) {
+  .value {
+    font-size: clamp(
+      18px,
+      calc(8vw * var(--ui-font-scale)),
+      calc(34px * var(--ui-font-scale))
+    );
+  }
+
+  .sudoku-board.board-size-9 .value {
+    font-size: clamp(
+      12px,
+      calc(5vw * var(--ui-font-scale)),
+      calc(20px * var(--ui-font-scale))
+    );
+    line-height: 1;
+  }
+
+  .number-pad button {
+    font-size: calc(20px * var(--ui-font-scale));
+  }
+}
+
+@media (max-width: 560px) and (max-height: 760px) and (orientation: portrait) {
+  .number-pad button {
+    font-size: calc(18px * var(--ui-font-scale));
+  }
+}
+
+@media (max-width: 340px) and (max-height: 760px) and (orientation: portrait) {
+  .sudoku-board.board-size-9 .value {
+    font-size: clamp(
+      12px,
+      calc(5vw * var(--ui-font-scale)),
+      calc(20px * var(--ui-font-scale))
+    );
+  }
+}
+
+/* Intrinsic grid sizing differs between WebKit and Chromium. Let mode cards
+   keep their content height and stretch the keypad independently of its text. */
+@media (max-width: 900px) and (orientation: portrait) {
+  .board-zone {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .board-wrap {
+    width: auto;
+    height: 100%;
+    max-height: var(--board-size);
+  }
+
+  .mode-grid {
+    grid-template-rows: repeat(4, minmax(min-content, 1fr));
+  }
+
+  .board-zone .number-pad {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    justify-self: stretch;
+    margin-inline: 0;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* A short embedded viewport cannot fit the HUD, a readable board and keypad.
+   Scroll one content surface rather than collapsing the board's grid row.
+   Desktop/landscape and the original main menu keep their existing layout. */
+@media (max-width: 900px) and (max-height: 567px) and (orientation: portrait) {
+  body[data-screen="game"] #gameScreen {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  #gameScreen .game-info {
+    flex: 0 0 auto;
+    grid-template-rows: auto auto auto auto;
+    overflow: visible;
+  }
+
+  #gameScreen .board-zone {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    overflow: visible;
+    width: 100%;
+  }
+
+  #gameScreen .board-wrap {
+    flex: 0 0 auto;
+    width: min(100%, 560px);
+    height: auto;
+    max-height: none;
+    aspect-ratio: 1;
+  }
+
+  #gameScreen .number-pad {
+    flex: 0 0 auto;
+    width: 100%;
+    align-self: center;
+  }
+}
+
+/* Portrait compatibility: avoid offscreen effects and nested rounded clips
+   on frequently repainted gameplay surfaces. Keep content scroll containers
+   and the original menu intact. No forced GPU promotion or repaint loops. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body[data-screen="game"],
+  body[data-screen="levels"] {
+    background: var(--background);
+  }
+
+  body[data-screen="game"] .app-shell,
+  body[data-screen="game"] .screen-host {
+    overflow: visible;
+  }
+
+  #gameScreen,
+  #gameScreen .board-wrap,
+  #gameScreen .sudoku-board {
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  #gameScreen,
+  #gameScreen *,
+  #gameScreen *::before,
+  #gameScreen *::after,
+  #levelScreen,
+  #levelScreen *,
+  #levelScreen *::before,
+  #levelScreen *::after,
+  body:not([data-screen="menu"]) .topbar-button,
+  body:not([data-screen="menu"]) .modal,
+  body:not([data-screen="menu"]) .modal * {
+    box-shadow: none;
+    text-shadow: none;
+    transition: none;
+    animation: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  #gameScreen button,
+  #levelScreen button,
+  body:not([data-screen="menu"]) .topbar-button {
+    transform: none;
+  }
+
+  #gameScreen.is-user-paused .sudoku-board {
+    filter: none;
+    opacity: 1;
+  }
+
+  #gameScreen.is-user-paused .value,
+  #gameScreen.is-user-paused .notes {
+    visibility: hidden;
+  }
+}
+
+/* Scaled copy must remain reachable when a compact viewport has less room
+   than the text needs. Keep scrolling on the content layer, never on the
+   board or its touch targets. */
+.modal-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html[data-text-scale="large"] .mode-card,
+html[data-text-scale="xlarge"] .mode-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* The main menu remains on its original typography and layout at every
+   selected text size. Larger copy is handled on the levels and game screens. */
+body[data-screen="menu"] {
+  font-size: 16px;
+}
+
+#menuScreen {
+  --ui-font-scale: 1;
+  font-size: 16px;
+}
+
+.modal {
+  font-size: calc(16px * var(--ui-font-scale));
+}
+
+/* Keep compact game labels readable without allowing one long word to be
+   hard-clipped inside the information panel. */
+@media (min-width: 561px) and (max-width: 900px) and (max-height: 540px) and (orientation: landscape) {
+  html[data-text-scale="large"] .game-info,
+  html[data-text-scale="xlarge"] .game-info {
+    gap: 2px;
+    padding: 4px 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html[data-text-scale="large"] .mode-copy > p,
+  html[data-text-scale="xlarge"] .mode-copy > p {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    max-width: 100%;
+    font-size: clamp(8px, calc(9px * var(--ui-font-scale)), 10px);
+    line-height: 1.1;
+  }
+
+  html[data-text-scale="large"] .stat-card span,
+  html[data-text-scale="xlarge"] .stat-card span {
+    font-size: clamp(8px, calc(9px * var(--ui-font-scale)), 10px);
+    line-height: 1;
+    white-space: normal;
   }
 }

@@ -5,7 +5,10 @@
   const SAVE_VERSION = 2;
   const GENERATOR_VERSION = 2;
   const SDK_SRC = "/sdk.js";
+  const FALLBACK_LANGUAGE = "en";
+  const SDK_SCRIPT_TIMEOUT_MS = 12000;
   const rngMod = 2147483647;
+  const TEXT_SCALE_OPTIONS = ["normal", "large", "xlarge"];
   let currentLanguage = "ru";
 
   const translations = {
@@ -51,6 +54,10 @@
       sound: "Звуковые сигналы",
       autoCheck: "Проверять ошибки сразу",
       highlight: "Подсвечивать связанные клетки",
+      textScale: "Размер текста",
+      textScaleNormal: "Обычный",
+      textScaleLarge: "Крупный",
+      textScaleXLarge: "Очень крупный",
       tutorialButton: "Как играть",
       tutorialTitle: "Обучение",
       tutorialGoal: "Цель",
@@ -152,7 +159,7 @@
       },
       achievementReceived: "Получено",
       achievementLocked: "Ещё закрыто",
-      achievementUnlockedTitle: "Новая ачивка",
+      achievementUnlockedTitle: "Новое достижение",
       achievementRewardPrefix: "Начислено",
       achievementCards: {
         firstWin: {
@@ -233,6 +240,10 @@
       sound: "Sound cues",
       autoCheck: "Check mistakes instantly",
       highlight: "Highlight related cells",
+      textScale: "Text size",
+      textScaleNormal: "Default",
+      textScaleLarge: "Large",
+      textScaleXLarge: "Extra large",
       tutorialButton: "How to play",
       tutorialTitle: "Tutorial",
       tutorialGoal: "Goal",
@@ -508,6 +519,9 @@
     cloudPendingForce: false,
     platformPauseHandler: null,
     platformResumeHandler: null,
+    stickyBannerWanted: null,
+    stickyBannerInFlight: null,
+    fullscreenAdInFlight: false,
     completed: false,
     modalStack: [],
     lastHintButtonMode: null,
@@ -520,7 +534,8 @@
       settings: {
         sound: true,
         autoCheck: true,
-        highlight: true
+        highlight: true,
+        textScale: "normal"
       },
       lastMode: "diagonal",
       best: {},
@@ -545,15 +560,24 @@
 
   document.addEventListener("DOMContentLoaded", init);
 
-  function init() {
+  async function init() {
     cacheElements();
-    applyLanguage("ru");
+    const ysdk = await initSdk();
+    state.sdk = ysdk;
+    const detectedLanguage = ysdk
+      ? ysdk.environment?.i18n?.lang
+      : (navigator.languages?.[0] || navigator.language);
+    applyLanguage(resolveLanguage(detectedLanguage));
     loadLocalData();
+    if (ysdk) {
+      subscribePlatformEvents(ysdk);
+      await loadPlayerData(ysdk);
+    }
     bindEvents();
     renderMenu();
-    loadSdkScript().then(initSdk);
     showMenu();
-    if (isDebugEnabled()) installSelfTests();
+    revealReadyInterface();
+    if (window.__LIGHT_SUDOKU_TEST__ === true) installSelfTests();
   }
 
   function cacheElements() {
@@ -563,9 +587,23 @@
       "progressText", "progressTrack", "progressFill", "modeIcon", "newPuzzleButton", "pauseButton", "hintButton", "tutorialButton", "undoButton", "eraseButton",
       "notesButton", "tipText", "board", "numberPad", "settingsModal", "soundToggle",
       "autoCheckToggle", "highlightToggle", "resetProgressButton", "closeSettingsButton",
-      "settingsModalIcon", "messageModal", "messageModalIcon", "messageTitle", "messageText", "messageActions"
+      "settingsModalIcon", "textScaleLegend", "messageModal", "messageModalIcon", "messageTitle", "messageText", "messageActions"
     ].forEach((id) => {
       el[id] = document.getElementById(id);
+    });
+    el.textScaleInputs = [...document.querySelectorAll('input[name="textScale"]')];
+    [document.querySelector(".app-shell"), el.settingsModal, el.messageModal]
+      .filter(Boolean)
+      .forEach(bindBrowserInteractionGuards);
+  }
+
+  function bindBrowserInteractionGuards(container) {
+    ["contextmenu", "selectstart", "dragstart"].forEach((eventName) => {
+      container.addEventListener(eventName, (event) => {
+        if (event.target instanceof Node && container.contains(event.target)) {
+          preventBrowserInteraction(event);
+        }
+      }, true);
     });
   }
 
@@ -646,7 +684,7 @@
   }
 
   function applyLanguage(language) {
-    currentLanguage = language === "ru" ? "ru" : "en";
+    currentLanguage = resolveLanguage(language);
     document.documentElement.lang = currentLanguage;
     document.title = t("gameTitle");
     el.backButton.textContent = t("back");
@@ -699,14 +737,31 @@
     [t("sound"), t("autoCheck"), t("highlight")].forEach((label, index) => {
       if (toggleTexts[index]) toggleTexts[index].textContent = label;
     });
+    if (el.textScaleLegend) el.textScaleLegend.textContent = t("textScale");
+    const textScaleLabels = document.querySelectorAll("[data-text-scale-label]");
+    const textScaleLabelKeys = {
+      normal: "textScaleNormal",
+      large: "textScaleLarge",
+      xlarge: "textScaleXLarge"
+    };
+    textScaleLabels.forEach((label) => {
+      const key = textScaleLabelKeys[label.dataset.textScaleLabel];
+      if (key) label.textContent = t(key);
+    });
     el.resetProgressButton.textContent = t("resetProgress");
     el.closeSettingsButton.textContent = t("done");
     if (el.settingsModalIcon) {
       el.settingsModalIcon.className = "modal-icon modal-icon-pause";
       el.settingsModalIcon.innerHTML = svgIcon("settings", "modal-svg");
     }
+    applyTextScale(state.data.settings.textScale);
     renderMenu();
     updateHud();
+  }
+
+  function resolveLanguage(language) {
+    const primaryCode = String(language || "").trim().toLowerCase().split(/[-_]/)[0];
+    return Object.prototype.hasOwnProperty.call(translations, primaryCode) ? primaryCode : FALLBACK_LANGUAGE;
   }
 
   function bindEvents() {
@@ -731,8 +786,12 @@
     el.undoButton.addEventListener("click", undo);
     el.eraseButton.addEventListener("click", eraseSelected);
     el.notesButton.addEventListener("click", toggleNotesMode);
-    el.gameScreen.addEventListener("contextmenu", (event) => event.preventDefault());
     el.resetProgressButton.addEventListener("click", resetProgress);
+    el.textScaleInputs?.forEach((input) => {
+      input.addEventListener("change", () => {
+        if (input.checked) updateSetting("textScale", input.value);
+      });
+    });
     el.soundToggle.addEventListener("change", () => updateSetting("sound", el.soundToggle.checked));
     el.autoCheckToggle.addEventListener("change", () => updateSetting("autoCheck", el.autoCheckToggle.checked));
     el.highlightToggle.addEventListener("change", () => updateSetting("highlight", el.highlightToggle.checked));
@@ -757,34 +816,31 @@
     });
   }
 
-  function initSdk() {
+  function preventBrowserInteraction(event) {
+    event.preventDefault();
+  }
+
+  async function initSdk() {
+    await loadSdkScript();
     if (!window.YaGames || typeof window.YaGames.init !== "function") {
-      return;
+      return null;
     }
-    window.YaGames.init()
-      .then((ysdk) => {
-        state.sdk = ysdk;
-        applyLanguage(ysdk.environment?.i18n?.lang || "ru");
-        renderMenu();
-        if (state.screen === "game" && state.puzzle) renderGame();
-        if (ysdk.features && ysdk.features.LoadingAPI && ysdk.features.LoadingAPI.ready) {
-          markReady();
-        }
-        subscribePlatformEvents(ysdk);
-        if (ysdk.getPlayer) {
-          return ysdk.getPlayer({ scopes: false }).then((player) => {
-            state.player = player;
-            return readCloudData(player);
-          }).catch(() => null);
-        }
-        return null;
-      })
-      .then((cloudData) => {
-        if (cloudData) mergeCloudData(cloudData);
-      })
-      .catch(() => {
-        state.sdk = null;
-      });
+    try {
+      return await window.YaGames.init();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function loadPlayerData(ysdk) {
+    if (!ysdk || typeof ysdk.getPlayer !== "function") return;
+    try {
+      state.player = await ysdk.getPlayer({ scopes: false });
+      const cloudData = await readCloudData(state.player);
+      if (cloudData) mergeCloudData(cloudData);
+    } catch (error) {
+      state.player = null;
+    }
   }
 
   function loadSdkScript() {
@@ -793,11 +849,19 @@
       return Promise.resolve();
     }
     return new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeoutId);
+        resolve();
+      };
       const script = document.createElement("script");
       script.src = SDK_SRC;
       script.async = true;
-      script.onload = resolve;
-      script.onerror = resolve;
+      script.onload = finish;
+      script.onerror = finish;
+      const timeoutId = window.setTimeout(finish, SDK_SCRIPT_TIMEOUT_MS);
       document.head.appendChild(script);
     });
   }
@@ -808,12 +872,24 @@
 
   function markReady() {
     if (state.readyMarked) return;
-    state.readyMarked = true;
+    const ready = state.sdk?.features?.LoadingAPI?.ready;
+    if (typeof ready !== "function") return;
     try {
-      state.sdk?.features?.LoadingAPI?.ready?.();
+      ready.call(state.sdk.features.LoadingAPI);
+      state.readyMarked = true;
+      document.body.dataset.gameReady = "true";
     } catch (error) {
       // Local play must continue even when SDK readiness fails.
     }
+  }
+
+  function revealReadyInterface() {
+    const shell = document.querySelector(".app-shell");
+    shell?.removeAttribute("inert");
+    shell?.removeAttribute("aria-hidden");
+    document.body.classList.remove("is-booting");
+    document.body.removeAttribute("aria-busy");
+    markReady();
   }
 
   function subscribePlatformEvents(ysdk) {
@@ -862,16 +938,53 @@
   }
 
   function mergeCloudData(cloudData) {
-    const migrated = migrateSave(cloudData);
-    if (!migrated) return;
+    const prepared = prepareCloudSave(cloudData);
+    if (!prepared) return;
     const localTime = state.data.updatedAt || 0;
-    const cloudTime = migrated.updatedAt || 0;
-    if (cloudTime > localTime) {
-      state.data = migrated;
-      saveLocalImmediately();
-      renderMenu();
-      if (state.screen === "game" && state.data.active && restoreActivePuzzle()) renderGame();
+    if (prepared.updatedAt <= localTime) return;
+    const merged = { ...state.data, updatedAt: prepared.updatedAt };
+    Object.entries(prepared.sections).forEach(([key, value]) => {
+      merged[key] = value;
+    });
+    state.data = sanitizeSaveV2(merged);
+    state.data.updatedAt = prepared.updatedAt;
+    saveLocalImmediately();
+    syncSettingsControls();
+    renderMenu();
+    if (state.screen === "game" && state.data.active && restoreActivePuzzle()) renderGame();
+  }
+
+  function prepareCloudSave(raw) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    const has = (key) => Object.prototype.hasOwnProperty.call(raw, key);
+    const rawVersion = raw.version == null ? 1 : Number(raw.version);
+    if (!Number.isInteger(rawVersion) || ![1, SAVE_VERSION].includes(rawVersion)) return null;
+    const updatedAt = Number(raw.updatedAt);
+    if (!Number.isFinite(updatedAt) || !Number.isInteger(updatedAt) || updatedAt < 0) return null;
+
+    const sections = {};
+    const objectSections = ["settings", "best", "stats", "achievements"];
+    for (const key of objectSections) {
+      if (!has(key)) continue;
+      if (!raw[key] || typeof raw[key] !== "object" || Array.isArray(raw[key])) return null;
+      sections[key] = key === "settings" ? sanitizeSettings(raw[key])
+        : key === "best" ? sanitizeBest(raw[key])
+          : key === "stats" ? sanitizeStats(raw[key])
+            : sanitizeAchievements(raw[key]);
     }
+    if (has("lastMode")) {
+      if (typeof raw.lastMode !== "string" || !modes.some((mode) => mode.id === raw.lastMode)) return null;
+      sections.lastMode = raw.lastMode;
+    }
+    if (has("active")) {
+      if (raw.active === null) {
+        sections.active = null;
+      } else if (raw.active && typeof raw.active === "object" && !Array.isArray(raw.active)) {
+        const active = sanitizeActiveSave(raw.active, rawVersion === 1);
+        if (active) sections.active = active;
+      }
+    }
+    return { updatedAt, sections };
   }
 
   function migrateSave(raw) {
@@ -884,7 +997,7 @@
     return {
       version: SAVE_VERSION,
       generatorVersion: GENERATOR_VERSION,
-      settings: { sound: true, autoCheck: true, highlight: true },
+      settings: { sound: true, autoCheck: true, highlight: true, textScale: "normal" },
       lastMode: "diagonal",
       best: {},
       stats: createEmptyStats(),
@@ -915,8 +1028,13 @@
     return {
       sound: settings?.sound !== false,
       autoCheck: settings?.autoCheck !== false,
-      highlight: settings?.highlight !== false
+      highlight: settings?.highlight !== false,
+      textScale: normalizeTextScale(settings?.textScale)
     };
+  }
+
+  function normalizeTextScale(value) {
+    return TEXT_SCALE_OPTIONS.includes(value) ? value : "normal";
   }
 
   function sanitizeBest(best) {
@@ -1092,10 +1210,21 @@
     el.soundToggle.checked = state.data.settings.sound;
     el.autoCheckToggle.checked = state.data.settings.autoCheck;
     el.highlightToggle.checked = state.data.settings.highlight;
+    const textScale = normalizeTextScale(state.data.settings.textScale);
+    el.textScaleInputs?.forEach((input) => {
+      input.checked = input.value === textScale;
+    });
+    applyTextScale(textScale);
+  }
+
+  function applyTextScale(value) {
+    document.documentElement.dataset.textScale = normalizeTextScale(value);
   }
 
   function updateSetting(key, value) {
+    if (key === "textScale") value = normalizeTextScale(value);
     state.data.settings[key] = value;
+    if (key === "textScale") applyTextScale(value);
     saveLocalData();
     if (key === "sound") {
       if (value) playTone("ok", true);
@@ -1138,7 +1267,7 @@
       card.querySelector(".mode-tutorial").addEventListener("click", () => showModeTutorial(mode.id));
       card.querySelector(".mode-new")?.addEventListener("click", () => {
         showMessage(t("messages.modeNewTitle"), t("messages.modeNewText"), [
-          { label: t("messages.startNew"), primary: true, action: () => startMode(mode.id, false) },
+          { label: t("messages.startNew"), primary: true, action: () => runFullscreenAdBefore(() => startMode(mode.id, false)) },
           { label: t("messages.stay") }
         ], { icon: "warning" });
       });
@@ -1158,6 +1287,7 @@
     stopTimer();
     notifyGameplayStop();
     state.screen = "menu";
+    syncStickyBanner(true);
     syncScreenChrome();
     clearPauses();
     el.menuScreen.hidden = false;
@@ -1173,6 +1303,7 @@
     stopTimer();
     notifyGameplayStop();
     state.screen = "levels";
+    syncStickyBanner(true);
     syncScreenChrome();
     clearPauses();
     el.menuScreen.hidden = true;
@@ -1207,12 +1338,12 @@
     if (active.modeId === modeId) {
       showMessage(t("messages.continueTitle"), t("messages.continueText"), [
         { label: t("continue"), primary: true, action: continueGame },
-        { label: t("messages.newGrid"), action: () => startMode(modeId, false) }
+        { label: t("messages.newGrid"), action: () => runFullscreenAdBefore(() => startMode(modeId, false)) }
       ], { icon: "warning" });
       return;
     }
     showMessage(t("messages.replaceTitle"), t("messages.replaceText"), [
-      { label: t("messages.replace"), primary: true, action: () => startMode(modeId, false) },
+        { label: t("messages.replace"), primary: true, action: () => runFullscreenAdBefore(() => startMode(modeId, false)) },
       { label: t("messages.stay") }
     ], { icon: "warning" });
   }
@@ -1313,6 +1444,7 @@
 
   function showGame() {
     state.screen = "game";
+    syncStickyBanner(false);
     syncScreenChrome();
     el.menuScreen.hidden = true;
     el.levelScreen.hidden = true;
@@ -1739,7 +1871,8 @@
     el.board.removeAttribute("role");
     el.board.removeAttribute("aria-rowcount");
     el.board.removeAttribute("aria-colcount");
-    el.board.innerHTML = "";
+    // Keep cell identity (and focus) stable instead of replacing the whole board.
+    const existingCells = Array.from(el.board.children);
     for (let index = 0; index < size * size; index += 1) {
       const row = Math.floor(index / size);
       const col = index % size;
@@ -1775,9 +1908,31 @@
         }
         button.appendChild(notes);
       }
-      button.addEventListener("click", () => selectCell(index));
-      el.board.appendChild(button);
+      const existing = existingCells[index];
+      if (existing) {
+        syncRenderedButton(existing, button);
+      } else {
+        button.addEventListener("click", () => selectCell(index));
+        el.board.appendChild(button);
+      }
     }
+    existingCells.slice(size * size).forEach((cell) => cell.remove());
+  }
+
+  function syncRenderedButton(existing, rendered) {
+    for (const attribute of Array.from(existing.attributes)) {
+      if (!rendered.hasAttribute(attribute.name)) existing.removeAttribute(attribute.name);
+    }
+    for (const attribute of rendered.attributes) {
+      if (existing.getAttribute(attribute.name) !== attribute.value) {
+        existing.setAttribute(attribute.name, attribute.value);
+      }
+    }
+    if (existing.innerHTML !== rendered.innerHTML) existing.replaceChildren(...rendered.childNodes);
+  }
+
+  function setTextIfChanged(node, text) {
+    if (node.textContent !== text) node.textContent = text;
   }
 
   function borderAfterColumn(mode, index, col) {
@@ -1812,7 +1967,7 @@
   function renderNumberPad() {
     const size = state.puzzle.mode.size;
     el.numberPad.className = `number-pad pad-size-${size}`;
-    el.numberPad.innerHTML = "";
+    const existingButtons = Array.from(el.numberPad.children);
     for (let value = 1; value <= size; value += 1) {
       const button = document.createElement("button");
       button.type = "button";
@@ -1820,9 +1975,15 @@
       const correctlyUsedCount = state.board.filter((item, index) => item === value && item === state.puzzle.solution[index]).length;
       button.disabled = !state.notesMode && correctlyUsedCount >= size;
       if (state.selected >= 0 && state.board[state.selected] === value) button.classList.add("selected-number");
-      button.addEventListener("click", () => enterValue(value));
-      el.numberPad.appendChild(button);
+      const existing = existingButtons[value - 1];
+      if (existing) {
+        syncRenderedButton(existing, button);
+      } else {
+        button.addEventListener("click", () => enterValue(value));
+        el.numberPad.appendChild(button);
+      }
     }
+    existingButtons.slice(size).forEach((button) => button.remove());
   }
 
   function selectCell(index) {
@@ -1977,6 +2138,67 @@
     }
   }
 
+  function runFullscreenAdBefore(continuation) {
+    if (state.fullscreenAdInFlight) return;
+    const showFullscreenAdv = state.sdk?.adv?.showFullscreenAdv;
+    let continued = false;
+    const continueOnce = () => {
+      if (continued) return;
+      continued = true;
+      state.fullscreenAdInFlight = false;
+      removePause("ad");
+      syncStickyBanner(state.screen !== "game");
+      continuation?.();
+    };
+    if (typeof showFullscreenAdv !== "function") {
+      continueOnce();
+      return;
+    }
+    state.fullscreenAdInFlight = true;
+    saveActiveState(false);
+    flushCloudSave();
+    addPause("ad");
+    try {
+      const result = showFullscreenAdv.call(state.sdk.adv, {
+        callbacks: {
+          onOpen: () => addPause("ad"),
+          onClose: () => continueOnce(),
+          onError: () => continueOnce()
+        }
+      });
+      if (result && typeof result.catch === "function") result.catch(() => continueOnce());
+    } catch (error) {
+      continueOnce();
+    }
+  }
+
+  function syncStickyBanner(shouldShow) {
+    const wanted = Boolean(shouldShow);
+    if (state.stickyBannerWanted === wanted && state.stickyBannerInFlight === null) return;
+    state.stickyBannerWanted = wanted;
+    applyStickyBanner();
+  }
+
+  function applyStickyBanner() {
+    if (state.stickyBannerInFlight !== null) return;
+    const adv = state.sdk?.adv;
+    const shouldShow = state.stickyBannerWanted;
+    const method = shouldShow ? adv?.showBannerAdv : adv?.hideBannerAdv;
+    if (typeof method !== "function") return;
+    state.stickyBannerInFlight = shouldShow;
+    const finish = () => {
+      if (state.stickyBannerInFlight !== shouldShow) return;
+      state.stickyBannerInFlight = null;
+      if (state.stickyBannerWanted !== shouldShow) applyStickyBanner();
+    };
+    try {
+      const result = method.call(adv);
+      Promise.resolve(result).then(finish, finish);
+    } catch (error) {
+      finish();
+    }
+  }
+
   function applyHint() {
     const target = findHintTarget();
     if (target < 0) return;
@@ -2013,7 +2235,7 @@
   }
 
   function checkWin() {
-    if (!state.puzzle) return;
+    if (!state.puzzle || state.completed) return;
     const filled = state.board.every(Boolean);
     if (!filled) return;
     const solved = state.board.every((value, index) => value === state.puzzle.solution[index]);
@@ -2025,6 +2247,7 @@
       ], { icon: "error" });
       return;
     }
+    state.completed = true;
     stopTimer();
     const modeId = state.puzzle.mode.id;
     const time = currentElapsed();
@@ -2034,14 +2257,13 @@
     }
     const unlockedAchievements = updateCompletionStats(modeId, time);
     playTone("win");
-    state.completed = true;
     updateHud();
     state.data.active = null;
     saveLocalData();
     flushCloudSave();
     notifyGameplayStop();
     showMessage(t("messages.winTitle"), buildWinMessage(time, state.mistakes, unlockedAchievements), [
-      { label: t("messages.newGrid"), primary: true, action: () => startMode(modeId, false) },
+      { label: t("messages.newGrid"), primary: true, action: () => runFullscreenAdBefore(() => startMode(modeId, false)) },
       { label: t("messages.toModes"), action: showLevelSelect },
       { label: t("messages.toMenu"), action: showMenu }
     ], { icon: "win", lockEscape: true, html: true });
@@ -2080,9 +2302,9 @@
   }
 
   function updateHud() {
-    el.timerText.textContent = formatTime(currentElapsed());
-    el.mistakesText.textContent = String(state.mistakes);
-    el.hintsText.textContent = String(state.hintsLeft);
+    setTextIfChanged(el.timerText, formatTime(currentElapsed()));
+    setTextIfChanged(el.mistakesText, String(state.mistakes));
+    setTextIfChanged(el.hintsText, String(state.hintsLeft));
     el.gameScreen.classList.toggle("is-user-paused", state.pausedReasons.has("user"));
     el.gameScreen.classList.toggle("is-completed", state.completed);
     if (!state.puzzle) {
@@ -2107,7 +2329,7 @@
     }
     const correct = state.board.filter((value, index) => value && value === state.puzzle.solution[index]).length;
     const progress = Math.round((correct / state.board.length) * 100);
-    el.progressText.textContent = `${progress}%`;
+    setTextIfChanged(el.progressText, `${progress}%`);
     if (el.progressFill) el.progressFill.style.width = `${progress}%`;
     if (el.progressTrack) el.progressTrack.setAttribute("aria-valuenow", String(progress));
     el.undoButton.disabled = !state.history.length;
@@ -2198,7 +2420,7 @@
 
   function confirmNewPuzzle() {
     showMessage(t("messages.newPuzzleTitle"), t("messages.newPuzzleText"), [
-      { label: t("messages.startNew"), primary: true, action: () => startMode(state.puzzle.mode.id, false) },
+      { label: t("messages.startNew"), primary: true, action: () => runFullscreenAdBefore(() => startMode(state.puzzle.mode.id, false)) },
       { label: t("messages.stay") }
     ], { icon: "warning" });
   }
@@ -2305,9 +2527,11 @@
     if (entry?.returnFocus && document.contains(entry.returnFocus)) entry.returnFocus.focus?.();
   }
 
-  function openSettings() {
+  function openSettings(event) {
     addPause("settings");
-    pushModal(el.settingsModal, "settings", document.activeElement);
+    // Safari does not always focus a button when it is tapped/clicked.
+    // Remember the actual opener rather than whichever element kept focus.
+    pushModal(el.settingsModal, "settings", event?.currentTarget || document.activeElement);
     syncSettingsControls();
     el.settingsModal.hidden = false;
     el.closeSettingsButton.focus?.();
@@ -2440,7 +2664,7 @@
 
   function focusSelectedCell() {
     const selected = el.board.querySelector(".cell.selected");
-    selected?.focus?.();
+    selected?.focus?.({ preventScroll: true });
   }
 
   function moveSelectionForward() {
@@ -2531,19 +2755,25 @@
 
   function notifyGameplayStart() {
     if (state.gameplayMarkedActive || state.screen !== "game" || !state.puzzle || state.completed || state.pausedReasons.size) return;
-    state.gameplayMarkedActive = true;
-    if (state.sdk && state.sdk.features && state.sdk.features.GameplayAPI && state.sdk.features.GameplayAPI.start) {
-      state.sdk.features.GameplayAPI.start();
-    } else if (state.sdk && state.sdk.adv && state.sdk.adv.showFullscreenAdv) {
-      // Some older SDK builds only expose advertising methods. Gameplay signals are optional locally.
+    const start = state.sdk?.features?.GameplayAPI?.start;
+    if (typeof start !== "function") return;
+    try {
+      start.call(state.sdk.features.GameplayAPI);
+      state.gameplayMarkedActive = true;
+    } catch (error) {
+      state.gameplayMarkedActive = false;
     }
   }
 
   function notifyGameplayStop() {
     if (!state.gameplayMarkedActive) return;
     state.gameplayMarkedActive = false;
-    if (state.sdk && state.sdk.features && state.sdk.features.GameplayAPI && state.sdk.features.GameplayAPI.stop) {
-      state.sdk.features.GameplayAPI.stop();
+    const stop = state.sdk?.features?.GameplayAPI?.stop;
+    if (typeof stop !== "function") return;
+    try {
+      stop.call(state.sdk.features.GameplayAPI);
+    } catch (error) {
+      // Gameplay state remains stopped even if the SDK signal fails.
     }
   }
 
@@ -2633,7 +2863,7 @@
     return canPlace(copy, mode, index, value);
   }
 
-  if (isDebugEnabled()) {
+  if (window.__LIGHT_SUDOKU_TEST__ === true) {
     window.lightSudokuDebug = {
       newPuzzle: (modeId) => startMode(modeId || state.data.lastMode || "classic", false),
       selfTest: () => window.lightSudokuSelfTest(),
